@@ -1,0 +1,39 @@
+# Fusion v15 - AI Agentic Operating System
+
+## Auto-Load Fusion v15
+When this project is opened in Cursor, automatically load Fusion v15 with all 32 agents.
+
+## Available Functions
+- `ask(prompt, agent_name)` - Ask a specific agent
+- `ask_auto(prompt)` - Auto-select best agent
+- `ask_chain(prompt, [agents])` - Run multiple agents
+- `get_agent_memory(agent_name)` - Get agent memory
+- `get_telemetry()` - Get system telemetry
+
+## Agent Categories
+- **Design Agents**: vp_design, creative_director, principal_designer
+- **AI Agents**: ai_native_ux_designer, ai_interaction_designer
+- **Evaluation Agents**: evaluator, design_judgment_engine
+- **Product Agents**: vp_of_product, product_navigator
+- **Content Agents**: content_designer, deck_narrator
+- **And 20+ more specialized agents**
+
+## Usage Examples
+```python
+# Design a mobile app
+ask("Design a mobile app interface", "vp_design")
+
+# Auto-select best agent
+ask_auto("Create a design system")
+
+# Multi-agent chain
+ask_chain("Evaluate this design", ["evaluator", "creative_director"])
+```
+
+## Fusion v15 Features
+- 32 Specialized AI Agents
+- Persistent Memory System
+- Real-time Telemetry
+- Multi-Agent Orchestration
+- RESTful API
+- Beautiful Web GUI

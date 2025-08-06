@@ -7,14 +7,10 @@ from typing import Dict, List, Any, Optional
 import asyncio
 import json
 import os
+import httpx
 
-# Import Fusion agents
-from agents.vp_design_agent import VPDesignAgent
-from agents.evaluator_agent import EvaluatorAgent
-from agents.design_technologist_agent import DesignTechnologistAgent
-from agents.ai_interaction_designer_agent import AIInteractionDesignerAgent
-from agents.workflow_optimizer_agent import WorkflowOptimizerAgent
-from agents.creative_director_agent import CreativeDirectorAgent
+# Import dynamic agent loader
+from core.agent_loader import load_agents, load_plugins
 
 # Import Fusion core components
 from fusion_core.memory.agent_memory import AgentMemory
@@ -38,6 +34,14 @@ class RunRequest(BaseModel):
     input: str
     use_memory: bool = True
     use_telemetry: bool = True
+    use_prompt_orchestrator: bool = True
+
+class PromptRequest(BaseModel):
+    input: str
+    agent_preference: Optional[str] = None
+    use_memory: bool = True
+    use_telemetry: bool = True
+    use_prompt_orchestrator: bool = True
 
 class ParallelRunRequest(BaseModel):
     agents: List[str]
@@ -54,15 +58,15 @@ class AgentStatus(BaseModel):
 telemetry_logger = AgentTelemetryLogger()
 memory_manager = None  # Will be initialized per agent if needed
 
-# Initialize agents
-agent_map = {
-    "vp_design": VPDesignAgent(),
-    "evaluator": EvaluatorAgent(),
-    "design_technologist": DesignTechnologistAgent(),
-    "ai_interaction_designer": AIInteractionDesignerAgent(),
-    "workflow_optimizer": WorkflowOptimizerAgent(),
-    "creative_director": CreativeDirectorAgent(),
-}
+# Initialize agents dynamically from manifest and plugins
+print("🚀 Loading agents dynamically...")
+agent_map = load_agents()
+print(f"✅ Loaded {len(agent_map)} core agents: {', '.join(agent_map.keys())}")
+
+# Load plugins
+plugin_agents = load_plugins()
+agent_map.update(plugin_agents)
+print(f"🔌 Total agents available: {len(agent_map)}")
 
 # Initialize orchestrator
 orchestrator = MultiAgentOrchestrator(
@@ -82,6 +86,54 @@ def load_agent_manifest():
 
 agent_manifest = load_agent_manifest()
 
+# Prompt Orchestrator Configuration
+PROMPT_ORCHESTRATOR_URL = "http://localhost:8001"
+
+async def call_prompt_orchestrator(prompt: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+    """Call the prompt orchestrator service for prompt rewriting and analysis"""
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"{PROMPT_ORCHESTRATOR_URL}/rewrite",
+                json={
+                    "prompt": prompt,
+                    "context": context or {},
+                    "use_memory": True,
+                    "use_fallback": True
+                }
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f"⚠️ Prompt orchestrator failed: {response.status_code}")
+                return {"original_prompt": prompt, "rewritten_prompt": prompt, "confidence": 0.5}
+                
+    except Exception as e:
+        print(f"⚠️ Prompt orchestrator error: {e}")
+        return {"original_prompt": prompt, "rewritten_prompt": prompt, "confidence": 0.5}
+
+async def get_agent_recommendation(prompt: str) -> Dict[str, Any]:
+    """Get agent routing recommendation from prompt orchestrator"""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(
+                f"{PROMPT_ORCHESTRATOR_URL}/route",
+                json={
+                    "prompt": prompt,
+                    "confidence_threshold": 0.7
+                }
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return {"recommended_agent": "evaluator", "confidence": 0.5}
+                
+    except Exception as e:
+        print(f"⚠️ Agent routing error: {e}")
+        return {"recommended_agent": "evaluator", "confidence": 0.5}
+
 @app.get("/")
 async def root():
     """Root endpoint with API information"""
@@ -89,8 +141,9 @@ async def root():
         "message": "Fusion v15 API",
         "version": "15.0.0",
         "endpoints": [
+            "/prompt - Universal prompt handler with auto-agent selection",
             "/run - Run single agent",
-            "/run_parallel - Run multiple agents",
+            "/run_parallel - Run multiple agents", 
             "/agents - List available agents",
             "/status - System status",
             "/memory/{agent} - Get agent memory",
@@ -100,7 +153,7 @@ async def root():
 
 @app.post("/run")
 async def run_agent(req: RunRequest):
-    """Run a single agent"""
+    """Run a single agent with optional prompt orchestration"""
     if req.agent not in agent_map:
         raise HTTPException(status_code=404, detail=f"Agent '{req.agent}' not found")
     
@@ -112,11 +165,24 @@ async def run_agent(req: RunRequest):
         memory = AgentMemory(req.agent)
     
     try:
+        # Use prompt orchestrator if enabled
+        final_input = req.input
+        orchestrator_result = None
+        
+        if req.use_prompt_orchestrator:
+            try:
+                orchestrator_result = await call_prompt_orchestrator(req.input)
+                if orchestrator_result.get("rewritten_prompt"):
+                    final_input = orchestrator_result["rewritten_prompt"]
+                    print(f"🔄 Prompt rewritten by orchestrator (confidence: {orchestrator_result.get('confidence', 0):.2f})")
+            except Exception as e:
+                print(f"⚠️ Prompt orchestrator failed, using original prompt: {e}")
+        
         # Run agent
         if hasattr(agent, 'run'):
-            output = await agent.run(req.input)
+            output = await agent.run(final_input)
         else:
-            output = str(agent(req.input))
+            output = str(agent(final_input))
         
         # Log to memory if enabled
         if memory:
@@ -130,13 +196,26 @@ async def run_agent(req: RunRequest):
                 output_text=output
             )
         
-        return {
+        result = {
             "agent": req.agent,
             "output": output,
             "success": True,
             "memory_enabled": req.use_memory,
-            "telemetry_enabled": req.use_telemetry
+            "telemetry_enabled": req.use_telemetry,
+            "prompt_orchestrator_used": req.use_prompt_orchestrator
         }
+        
+        # Include orchestrator metadata if used
+        if orchestrator_result:
+            result["orchestrator_metadata"] = {
+                "original_prompt": orchestrator_result.get("original_prompt"),
+                "rewritten_prompt": orchestrator_result.get("rewritten_prompt"),
+                "pattern_type": orchestrator_result.get("pattern_type"),
+                "confidence": orchestrator_result.get("confidence"),
+                "suggested_agents": orchestrator_result.get("suggested_agents", [])
+            }
+        
+        return result
         
     except Exception as e:
         # Log error
@@ -149,6 +228,55 @@ async def run_agent(req: RunRequest):
             )
         
         raise HTTPException(status_code=500, detail=f"Agent execution failed: {str(e)}")
+
+@app.post("/prompt") 
+async def handle_prompt(req: PromptRequest):
+    """
+    Universal prompt handler with auto-agent selection
+    Uses prompt orchestrator to determine best agent and rewrite prompt
+    """
+    try:
+        # Get agent recommendation from prompt orchestrator
+        agent_recommendation = None
+        final_agent = req.agent_preference or "evaluator"
+        
+        if req.use_prompt_orchestrator:
+            try:
+                agent_recommendation = await get_agent_recommendation(req.input)
+                recommended_agent = agent_recommendation.get("recommended_agent")
+                
+                # Use recommendation if agent exists and no preference specified
+                if not req.agent_preference and recommended_agent in agent_map:
+                    final_agent = recommended_agent
+                    print(f"🎯 Auto-selected agent: {final_agent} (confidence: {agent_recommendation.get('confidence', 0):.2f})")
+                    
+            except Exception as e:
+                print(f"⚠️ Agent recommendation failed: {e}")
+        
+        # Create RunRequest and execute
+        run_request = RunRequest(
+            agent=final_agent,
+            input=req.input,
+            use_memory=req.use_memory,
+            use_telemetry=req.use_telemetry,
+            use_prompt_orchestrator=req.use_prompt_orchestrator
+        )
+        
+        result = await run_agent(run_request)
+        
+        # Add auto-selection metadata
+        if agent_recommendation:
+            result["auto_selection"] = {
+                "recommended_agent": agent_recommendation.get("recommended_agent"),
+                "confidence": agent_recommendation.get("confidence"),
+                "alternatives": agent_recommendation.get("alternatives", []),
+                "reasoning": agent_recommendation.get("reasoning")
+            }
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Prompt handling failed: {str(e)}")
 
 @app.post("/run_parallel")
 async def run_parallel_agents(req: ParallelRunRequest):
