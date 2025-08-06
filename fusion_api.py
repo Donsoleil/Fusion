@@ -230,6 +230,35 @@ async def run_agent(req: RunRequest):
         
         raise HTTPException(status_code=500, detail=f"Agent execution failed: {str(e)}")
 
+@app.post("/run/auto")
+async def run_auto(req: RunRequest):
+    """
+    Auto-routing endpoint that selects the best agent and rewrites prompts
+    """
+    try:
+        # Step 1: Rewrite the prompt using orchestrator
+        rewritten_prompt = await orchestrator.rewrite(req.input)
+        
+        # Step 2: Select the best agent for the rewritten prompt
+        selected_agent = orchestrator.select_agent(rewritten_prompt)
+        
+        print(f"🎯 Auto-selected agent: {selected_agent} for prompt: {req.input[:50]}...")
+        
+        # Step 3: Dispatch to the selected agent
+        output = await dispatcher.dispatch(selected_agent, rewritten_prompt)
+        
+        return {
+            "agent": selected_agent,
+            "input": req.input,
+            "rewritten_prompt": rewritten_prompt,
+            "output": output,
+            "success": True,
+            "auto_selected": True
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Auto-routing failed: {str(e)}")
+
 @app.post("/prompt") 
 async def handle_prompt(req: PromptRequest):
     """

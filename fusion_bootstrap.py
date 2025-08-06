@@ -90,15 +90,13 @@ class FusionBootstrap:
             "requirements.txt",
             "pyproject.toml",
             "Dockerfile",
-            "FUSION_V15_README.md",
-            "FUSION_V15_DELIVERY_SUMMARY.md"
+            "README.md"  # Use current README instead of archived files
         ]
         
         # Add prompt masters if they exist
-        if (self.project_dir / "prompt_master_short.md").exists():
-            files_to_copy.append("prompt_master_short.md")
-        if (self.project_dir / "prompt_master_main.md").exists():
-            files_to_copy.append("prompt_master_main.md")
+        # Only use master_prompt.md (the current active prompt file)
+        if (self.project_dir / "master_prompt.md").exists():
+            files_to_copy.append("master_prompt.md")
         
         print("📁 Creating ChatGPT upload folder...")
         for file_path in files_to_copy:

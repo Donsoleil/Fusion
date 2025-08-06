@@ -52,9 +52,7 @@ export default function FusionChat() {
     const [isRecording, setIsRecording] = useState(false);
     const [voiceRecording, setVoiceRecording] = useState<VoiceRecording | null>(null);
     const [imageAttachments, setImageAttachments] = useState<ImageAttachment[]>([]);
-    const [selectedAgent, setSelectedAgent] = useState<string>("vp_design");
     const [useOrchestrator, setUseOrchestrator] = useState(true);
-    const [availableAgents, setAvailableAgents] = useState<string[]>([]);
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
@@ -70,27 +68,7 @@ export default function FusionChat() {
         scrollToBottom();
     }, [messages]);
 
-    // Fetch available agents on component mount
-    useEffect(() => {
-        const fetchAgents = async () => {
-            try {
-                const response = await fetch("http://localhost:8000/agents");
-                if (response.ok) {
-                    const data = await response.json();
-                    setAvailableAgents(data.agents || []);
-                } else {
-                    console.warn("Could not fetch agents, using defaults");
-                    setAvailableAgents(["vp_design", "creative_director", "evaluator"]);
-                }
-            } catch (error) {
-                console.warn("Error fetching agents:", error);
-                setAvailableAgents(["vp_design", "creative_director", "evaluator"]);
-            }
-        };
-        fetchAgents();
-    }, []);
-
-    // Helper function to format agent names for display
+    // Helper function to format agent names for display in messages
     const formatAgentName = (agentKey: string): string => {
         const agentNames: { [key: string]: string } = {
             "vp_design": "VP of Design",
@@ -224,14 +202,13 @@ export default function FusionChat() {
                 requestInput += `\n[${imageAttachments.length} image(s) attached: ${imageAttachments.map(img => img.name).join(", ")} - please acknowledge these images]`;
             }
 
-            // Send to Fusion API using the /run endpoint
-            const response = await fetch("http://localhost:8000/run", {
+            // Send to Fusion API using the /run/auto endpoint for intelligent agent selection
+            const response = await fetch("http://localhost:8000/run/auto", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    agent: selectedAgent,
                     input: requestInput || "Please provide a design recommendation",
                 }),
             });
@@ -250,10 +227,11 @@ export default function FusionChat() {
                 agent: result.agent,
                 timestamp: new Date(),
                 metadata: {
-                    confidence: 0.9, // Default since API doesn't provide this yet
-                    pattern_type: "direct_agent",
+                    confidence: 0.9,
+                    pattern_type: "auto_selected",
                     suggested_agents: [result.agent],
-                    orchestrator_used: false,
+                    orchestrator_used: result.auto_selected || false,
+                    rewritten_prompt: result.rewritten_prompt,
                 },
             };
 
@@ -262,7 +240,7 @@ export default function FusionChat() {
             // Show success toast with agent info
             toast({
                 title: "Response from Fusion",
-                description: `Agent: ${result.agent} responded successfully!`,
+                description: `Auto-selected ${formatAgentName(result.agent)} responded successfully!`,
             });
 
         } catch (error) {
@@ -315,23 +293,14 @@ export default function FusionChat() {
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        {/* Agent Selection */}
+                        {/* Auto-routing indicator */}
                         <div className="flex items-center space-x-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Agent:
-                            </label>
-                            <Select value={selectedAgent} onValueChange={setSelectedAgent}>
-                                <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="Select an agent" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {availableAgents.map((agent) => (
-                                        <SelectItem key={agent} value={agent}>
-                                            {formatAgentName(agent)}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <div className="flex items-center space-x-1">
+                                <Brain className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Auto-Agent Selection
+                                </span>
+                            </div>
                         </div>
 
                         {/* Orchestrator Toggle */}
