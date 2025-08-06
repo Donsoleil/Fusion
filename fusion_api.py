@@ -58,6 +58,10 @@ class AgentStatus(BaseModel):
 telemetry_logger = AgentTelemetryLogger()
 memory_manager = None  # Will be initialized per agent if needed
 
+# Initialize dispatcher for proper agent routing
+from core.dispatcher import dispatcher
+from core.orchestrator import orchestrator
+
 # Initialize agents dynamically from manifest and plugins
 print("🚀 Loading agents dynamically...")
 agent_map = load_agents()
@@ -178,11 +182,8 @@ async def run_agent(req: RunRequest):
             except Exception as e:
                 print(f"⚠️ Prompt orchestrator failed, using original prompt: {e}")
         
-        # Run agent
-        if hasattr(agent, 'run'):
-            output = await agent.run(final_input)
-        else:
-            output = str(agent(final_input))
+        # Use dispatcher for proper agent execution
+        output = await dispatcher.dispatch(req.agent, final_input)
         
         # Log to memory if enabled
         if memory:
