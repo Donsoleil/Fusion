@@ -56,3 +56,4 @@ pattern_feedback_log.json
 test_results/
 outputs/
 fallback_log.json
+node_modules/

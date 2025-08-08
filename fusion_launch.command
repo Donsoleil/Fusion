@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Launching Fusion v14.5..."
+echo "🚀 Launching Fusion v15..."
 
 # Change to the script directory
 cd "$(dirname "$0")"
@@ -25,11 +25,11 @@ if [ ! -f "synthetic_reasoner_agent.py" ]; then
 fi
 
 # Load Fusion bootstrap system
-echo "🛡️ Loading Fusion v14.5 bootstrap system..."
+echo "🛡️ Loading Fusion v15 bootstrap system..."
 python3 -c "
 try:
     import cursor_init
-    print('✅ Fusion v14.5 bootstrap loaded successfully')
+    print('✅ Fusion v15 bootstrap loaded successfully')
     print('🎯 You can now use: ask(\"your prompt\", \"agent\")')
     print('🤖 Auto-agent: ask_auto(\"your prompt\")')
     print('🔗 Chain support: ask_chain(\"prompt\", [\"agent1\", \"agent2\"])')
@@ -40,10 +40,10 @@ except Exception as e:
 bootstrap_status=$?
 
 # Run help to confirm CLI setup
-echo "🔧 Testing Fusion v14.5 setup..."
+echo "🔧 Testing Fusion v15 setup..."
 python3 fusion.py --help
 
-echo "✅ Fusion v14.5 is ready!"
+echo "✅ Fusion v15 is ready!"
 echo ""
 echo "🎯 Usage Options:"
 echo "   1. Native Cursor (recommended):"

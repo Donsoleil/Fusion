@@ -27,13 +27,13 @@ def fusion_bootstrap():
         # Add auto-agent selection
         globals()["ask_auto"] = auto_select_agent  # Automatic agent selection
         
-        print("✅ Fusion v14.5 Loaded — Just use: ask('your prompt', 'agent')")
+        print("✅ Fusion v15 Loaded — Just use: ask('your prompt', 'agent')")
         print("🛡️ Guardrails, fallback, and debug are all ACTIVE")
         print("🔗 Chain support: ask_chain('prompt', ['agent1', 'agent2'])")
         print("🤖 Auto-agent: ask_auto('prompt') - automatically selects best agent")
 
     except Exception as e:
-        print(f"❌ Failed to auto-load Fusion: {e}")
+        print(f"❌ Failed to auto-load Fusion v15: {e}")
 
 def run_agent_chain(prompt, agent_list):
     """Run multiple agents in sequence on the same prompt"""

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC Agentic Support - Improved Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'btc-orange': '#f7931a',
+                        'confidence-high': '#10b981',
+                        'confidence-medium': '#f59e0b',
+                        'confidence-low': '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes pulse-thinking {
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .thinking-pulse {
+            animation: pulse-thinking 1.5s ease-in-out infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .ai-processing {
+            background: linear-gradient(-45deg, #3b82f6, #1d4ed8, #3b82f6, #60a5fa);
+            background-size: 400% 400%;
+            animation: gradient-shift 2s ease infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen">
+        <!-- Left Sidebar - Enhanced Visual Hierarchy -->
+        <div class="w-1/3 bg-white border-r border-gray-200 flex flex-col">
+            <!-- Case Header - Stronger Visual Weight -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                <div class="flex items-center justify-between mb-2">
+                    <h1 class="text-lg font-bold text-gray-900">BTC 62-0846</h1>
+                    <span class="text-sm text-gray-500">Jul 7, 2025 • 10:45am</span>
+                </div>
+                <p class="text-sm text-gray-700 leading-relaxed">Bitcoin withdrawal stuck in mempool due to insufficient
+                    network fees</p>
+            </div>
+
+            <!-- Customer Profile - Enhanced Information Architecture -->
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span class="text-sm font-medium text-gray-700">JS</span>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Jake S.</p>
+                        <p class="text-sm text-gray-600">$jakeschw</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <span
+                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Verified US
+                        </span>
+                        <span
+                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Clean Risk
+                        </span>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <p>jakeeschwarze.com • (944) 675 6756</p>
+                </div>
+            </div>
+
+            <!-- BTC Accounts - Improved Component Structure -->
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-900 mb-3">BTC Accounts</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">Business Account</p>
+                            <p class="text-xs text-gray-600">$jakeschw-biz</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-gray-900">0.15678 BTC</p>
+                            <span
+                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Clean Risk
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">Personal Account</p>
+                            <p class="text-xs text-gray-600">$jakeschw</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-gray-900">0.00234 BTC</p>
+                            <span
+                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Clean Risk
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">Savings Account</p>
+                            <p class="text-xs text-gray-600">$jakeschw-save</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-gray-900">0.07500 BTC</p>
+                            <span
+                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Moderate Risk
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linked Information -->
+            <div class="px-6 py-4 flex-grow">
+                <div class="mb-4">
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">Linked cases</h4>
+                    <div class="space-y-1 text-sm text-gray-600">
+                        <p>CS-2025-001201</p>
+                        <p>CS-2025-001201</p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">Linked transactions</h4>
+                    <div class="space-y-1 text-sm text-gray-600">
+                        <p>TX-BTC-789123</p>
+                        <p>TX-BTC-789123</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">Tracked issues</h4>
+                    <p class="text-sm text-gray-600">Based on 14 tickets and 32 sources</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Main Area - Enhanced Conversational Design -->
+        <div class="flex-1 flex flex-col">
+            <!-- Conversation Area -->
+            <div class="flex-1 px-6 py-4 overflow-y-auto">
+                <!-- Customer Message -->
+                <div class="flex space-x-3 mb-6">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-sm font-medium text-gray-700">👤</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-gray-100 rounded-lg px-4 py-3 max-w-md">
+                            <p class="text-gray-900">Why hasn't this BTC withdrawal reached the wallet yet?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Analysis - Enhanced Status Communication -->
+                <div class="flex space-x-3 mb-6">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-sm font-medium text-white">AI</span>
+                    </div>
+                    <div class="flex-1">
+                        <!-- AI Processing Status - Improved Real-time Communication -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full thinking-pulse"></div>
+                                <span class="text-sm font-medium text-blue-800">AI Analysis in Progress</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-1.5">
+                                    <div class="ai-processing h-1.5 rounded-full w-3/4"></div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-blue-700 space-y-1">
+                                <p>✓ Transaction located in mempool</p>
+                                <p>✓ Blockchain confirmations: 2/3 confirmed</p>
+                                <p>✓ Address analysis: Custodial Binance address detected</p>
+                                <p class="thinking-pulse">⏳ Analyzing network congestion patterns...</p>
+                            </div>
+                        </div>
+
+                        <!-- AI Recommendation with Enhanced Confidence Scoring -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-semibold text-gray-900">AI Recommendation</h4>
+                                <div class="flex items-center space-x-2">
+                                    <span
+                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-confidence-high bg-green-100 text-green-800">
+                                        92% Confidence
+                                    </span>
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                                <p class="text-sm text-gray-700 leading-relaxed">
+                                    "Hi Jake! I can see your 0.15 BTC withdrawal is currently processing with 2/3
+                                    blockchain confirmations.
+                                    The delay is likely due to batching at the exchange. Based on current network
+                                    conditions,
+                                    your transaction should complete within the next 15-20 minutes."
+                                </p>
+                            </div>
+
+                            <!-- Enhanced User Override Controls -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex space-x-2">
+                                    <button
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors">
+                                        ✓ Approve & Send
+                                    </button>
+                                    <button
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-gray-600 text-white hover:bg-gray-700 transition-colors">
+                                        ✏️ Edit Message
+                                    </button>
+                                    <button
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors">
+                                        ✕ Reject
+                                    </button>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    Based on 1,247 similar cases
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional AI Insights - Progressive Disclosure -->
+                        <div class="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-xs font-medium text-yellow-800">💡 Additional Insights</span>
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    78% Confidence
+                                </span>
+                            </div>
+                            <details class="text-sm text-yellow-700">
+                                <summary class="cursor-pointer hover:text-yellow-800">View technical details</summary>
+                                <div class="mt-2 space-y-1 text-xs">
+                                    <p>• Network fee: 12 sat/vB (below recommended 18 sat/vB)</p>
+                                    <p>• Mempool position: #2,847 in queue</p>
+                                    <p>• Exchange batching window: Every 20-30 minutes</p>
+                                    <p>• Historical completion time: 85% within 25 minutes</p>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Chat Input Area -->
+            <div class="border-t border-gray-200 px-6 py-4 bg-white">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Case: BTC 62-0846</span>
+                    <div class="flex items-center space-x-2">
+                        <span
+                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            AI Ready
+                        </span>
+                        <span class="text-sm text-gray-500">Waiting for approval</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <div class="flex-1">
+                        <input type="text" placeholder="Ask AI for additional analysis or type your own message..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                    <button class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z">
+                            </path>
+                        </svg>
+                    </button>
+                    <button class="px-3 py-2 text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

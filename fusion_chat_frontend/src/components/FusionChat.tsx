@@ -70,6 +70,11 @@ export default function FusionChat() {
 
     // Helper function to format agent names for display in messages
     const formatAgentName = (agentKey: string): string => {
+        // Handle undefined/null agent names
+        if (!agentKey || typeof agentKey !== 'string') {
+            return "Unknown Agent";
+        }
+
         const agentNames: { [key: string]: string } = {
             "vp_design": "VP of Design",
             "creative_director": "Creative Director",
@@ -97,6 +102,7 @@ export default function FusionChat() {
             "workflow_optimizer": "Workflow Optimizer",
             "component_librarian": "Component Librarian"
         };
+
         return agentNames[agentKey] || agentKey.split('_').map(word =>
             word.charAt(0).toUpperCase() + word.slice(1)
         ).join(' ');
@@ -202,13 +208,14 @@ export default function FusionChat() {
                 requestInput += `\n[${imageAttachments.length} image(s) attached: ${imageAttachments.map(img => img.name).join(", ")} - please acknowledge these images]`;
             }
 
-            // Send to Fusion API using the /run/auto endpoint for intelligent agent selection
-            const response = await fetch("http://localhost:8000/run/auto", {
+            // Send to Fusion API using the /run endpoint with evaluator agent
+            const response = await fetch("http://localhost:8000/run", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    agent: "evaluator",
                     input: requestInput || "Please provide a design recommendation",
                 }),
             });
@@ -224,13 +231,13 @@ export default function FusionChat() {
                 id: (Date.now() + 1).toString(),
                 text: result.output || "No response from agent",
                 from: "fusion",
-                agent: result.agent,
+                agent: result.agent || "unknown",
                 timestamp: new Date(),
                 metadata: {
                     confidence: 0.9,
-                    pattern_type: "auto_selected",
-                    suggested_agents: [result.agent],
-                    orchestrator_used: result.auto_selected || false,
+                    pattern_type: "direct_agent",
+                    suggested_agents: [result.agent || "unknown"],
+                    orchestrator_used: false,
                     rewritten_prompt: result.rewritten_prompt,
                 },
             };
@@ -240,7 +247,7 @@ export default function FusionChat() {
             // Show success toast with agent info
             toast({
                 title: "Response from Fusion",
-                description: `Auto-selected ${formatAgentName(result.agent)} responded successfully!`,
+                description: `${formatAgentName(result.agent)} responded successfully!`,
             });
 
         } catch (error) {

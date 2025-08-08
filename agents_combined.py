@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Agents Combined - Fusion v14.5
+Agents Combined - Fusion v15
 Combines all 32 agents for easy access
 """
 
